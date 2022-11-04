@@ -1,0 +1,13 @@
+select distinct  patients.*,icustays.hadm_id	,icustays.stay_id,	first_careunit ,intime,	outtime,	los from physionet-data.mimic_core.patients as  patients
+left join  physionet-data.mimic_icu.icustays as icustays on patients.subject_id=icustays.subject_id
+left join physionet-data.mimic_icu.procedureevents as procedureevents on procedureevents.stay_id =icustays.stay_id
+left join  physionet-data.mimic_core.admissions as admissions on icustays.hadm_id=admissions.hadm_id
+left join  physionet-data.mimic_hosp.procedures_icd  as procedures_icd on icustays.hadm_id=procedures_icd.hadm_id
+where 1=1
+and anchor_age>=20
+and anchor_age<=89
+and los >1
+and (itemid=225466 or (hospital_expire_flag=1  and icd_code='9960' and intime<=deathtime
+and outtime>=deathtime))
+
+order by patients.subject_id
