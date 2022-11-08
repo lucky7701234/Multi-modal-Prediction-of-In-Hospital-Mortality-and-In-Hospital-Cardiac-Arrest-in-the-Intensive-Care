@@ -1,0 +1,19 @@
+select distinct  icustays.subject_id 
+,case when  aids.subject_id is null then 0 else 1 end as aids  from  physionet-data.mimic_icu.icustays as icustays 
+
+left join physionet-data.mimic_hosp.diagnoses_icd as aids on aids.hadm_id=icustays.hadm_id and seq_num>1 
+and (
+
+   icd_code like '042%'
+or icd_code like '043%'
+or icd_code like '044%'
+or icd_code like 'B20%'
+or icd_code like 'B21%'
+or icd_code like 'B22%'
+or icd_code like 'B24%'
+
+)
+
+where  1=1 
+
+order by aids desc
