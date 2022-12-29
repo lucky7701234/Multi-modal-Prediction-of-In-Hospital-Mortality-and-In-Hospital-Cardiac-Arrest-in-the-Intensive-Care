@@ -1,0 +1,100 @@
+with my_main as (  with vital_main as  (with main as ( select  patient.patientunitstayid,min(diagnosisoffset) as  diagnosisoffset ,min(diagnosisoffset)-1440 as minoff from `physionet-data.eicu_crd.patient` as patient
+left join  `physionet-data.eicu_crd.diagnosis` as diagnosis on patient.patientunitstayid=diagnosis.patientunitstayid
+
+where 1=1
+and  Diagnosisoffset >=1440 
+and icd9code='427.5, I46.9'
+and patient.patientunitstayid in
+(
+  251885,
+  270217,
+  294603,
+  450349,
+  459767,
+  466989,
+  525422,
+  528316,
+  617978,
+  689518,
+  692059,
+  759031,
+  767465,
+  784451,
+  857826,
+  924771,
+  1012459,
+  1077136,
+  1085425,
+  1093487,
+  1138618,
+  1474647,
+  1493237,
+  1522898,
+  1564271,
+  1566889,
+  1588733,
+  2832188,
+  2864857,
+  3034037,
+  3038834,
+  3060594,
+  3081132,
+  3089484,
+  3091229,
+  3109000,
+  3144369,
+  3146941,
+  3328859,
+  3336056,
+  3343157,
+  3039810
+
+)
+
+group by patientunitstayid
+ )
+
+select main.*,
+case when observationoffset>=diagnosisoffset -(1*60) then 1
+when observationoffset>=diagnosisoffset -(2*60) then 2
+when observationoffset>=diagnosisoffset -(3*60) then 3
+when observationoffset>=diagnosisoffset -(4*60) then 4
+when observationoffset>=diagnosisoffset -(5*60) then 5
+when observationoffset>=diagnosisoffset -(6*60) then 6
+when observationoffset>=diagnosisoffset -(7*60) then 7
+when observationoffset>=diagnosisoffset -(8*60) then 8
+when observationoffset>=diagnosisoffset -(9*60) then 9
+when observationoffset>=diagnosisoffset -(10*60) then 10
+when observationoffset>=diagnosisoffset -(11*60) then 11
+when observationoffset>=diagnosisoffset -(12*60) then 12
+when observationoffset>=diagnosisoffset -(13*60) then 13
+when observationoffset>=diagnosisoffset -(14*60) then 14
+when observationoffset>=diagnosisoffset -(15*60) then 15
+when observationoffset>=diagnosisoffset -(16*60) then 16
+when observationoffset>=diagnosisoffset -(17*60) then 17
+when observationoffset>=diagnosisoffset -(18*60) then 18
+when observationoffset>=diagnosisoffset -(19*60) then 19
+when observationoffset>=diagnosisoffset -(20*60) then 20
+when observationoffset>=diagnosisoffset -(21*60) then 21
+when observationoffset>=diagnosisoffset -(22*60) then 22
+when observationoffset>=diagnosisoffset -(23*60) then 23
+when observationoffset>=diagnosisoffset -(24*60) then 24
+else 0 end as timeLV
+,  observationoffset,heartRate as vHR, respiration as vRR,  systemicSystolic as vsbp, systemicDiastolic as vdbp, systemicMean as vmbp,saO2 as vspo2 from main
+left join `physionet-data.eicu_crd.vitalperiodic` as vitalPeriodic on main.patientunitstayid=vitalPeriodic.patientunitstayid and vitalPeriodic.observationOffset<main.diagnosisoffset and  vitalPeriodic.observationOffset>=main.minoff
+
+where 1=1
+)
+
+select patientunitstayid,timeLV, max(vHR) as max_vHR,min(vHR) as min_vHR,max(vRR) as max_RR,min(vRR) AS min_RR,min(vsbp) as vsbp,min(vdbp) as vdbp,min(vmbp) as vmbp,min(vspo2) as vspo2 from vital_main
+
+where 1=1
+
+group by patientunitstayid,timeLV
+
+)
+
+select patientunitstayid,timeLV, case when min_vHR>=80 then max_vHR else min_vHR end as vHR , case when min_RR>=12 then max_RR else min_RR end as vRR ,vsbp,vdbp,vmbp,vspo2 from my_main
+where 1=1
+
+order by patientunitstayid,timeLV  

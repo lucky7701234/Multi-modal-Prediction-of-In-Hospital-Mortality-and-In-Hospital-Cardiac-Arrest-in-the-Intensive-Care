@@ -1,0 +1,10 @@
+select  distinct patient.* from `physionet-data.eicu_crd.patient` as patient
+left join  `physionet-data.eicu_crd.diagnosis` as diagnosis on patient.patientunitstayid=diagnosis.patientunitstayid
+
+where 1=1
+and  Diagnosisoffset >=1440 and icd9code='427.5, I46.9'
+and age!='> 89' and age!='' and age!='0' and age!='1' and age!='2' and age!='3' and age!='4' and age!='5' and age!='6' and age!='7' and age!='8' and age!='9' and age!='10' and age!='11' and age!='12' and age!='13' and age!='14' and age!='15' and age!='16' and age!='17' and age!='18' and age!='19' 
+
+order by patientunitstayid
+
+
